@@ -1,5 +1,6 @@
 # ShipmasterChad.py
 
+import configparser
 import random
 import datetime
 import sys
@@ -7,13 +8,13 @@ import os
 import discord
 from discord.ext import commands
 
-
-TOKEN = 'NzExOTgxMTUwNzI5NTM1NTI4.Xsn9Qw.aY-Xtjs3pCP_RrIVThsp2beMJI0'
-
+config = configparser.ConfigParser()
 client = commands.Bot(command_prefix='~')
 client.remove_command('help')
 now = datetime.datetime.now()
-color = 0xa987df
+config.read('chad_config.ini')
+TOKEN = config.get('default', 'token')
+color = int(config.get('default', 'color'), 16)
 
 # list of commands accessible to public
 comm = ["~help", "list commands", "~quote", "reply with a random quote from a list", "~8ball", "tells your fortune",
