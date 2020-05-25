@@ -8,17 +8,23 @@ import os
 import discord
 from discord.ext import commands
 
+now = datetime.datetime.now()
 config = configparser.ConfigParser()
 client = commands.Bot(command_prefix='~')
 client.remove_command('help')
-now = datetime.datetime.now()
+
+# import variables from chad_config.ini
 config.read('chad_config.ini')
 TOKEN = config.get('default', 'token')
 color = int(config.get('default', 'color'), 16)
+id = config.get('default', 'id')
 
 # list of commands accessible to public
 comm = ["~help", "list commands", "~quote", "reply with a random quote from a list", "~8ball", "tells your fortune",
-        "~spam [user] [amt] [msg]", "spams a [user] with a [msg] [amt] times"]
+        "~spam [user] [amt] [msg]", "spams a [user] with a [msg] [amt] times", '~diagnose [user] [diagnosis]',
+        'diagnoses a [user] with a [diagnosis]', '~insult [user]', 'randomly generates an insult directed at [user]',
+        '~winner[*users]', 'choose a winner from a list of [users]', '~blame',
+        'choose a person to blame from a list of [users]']
 
 # list of all commands
 all_commands = ["~ping", "replies with bot's latency", "~clear[amt]", "clears [amt] messages in the channel",
@@ -72,9 +78,16 @@ weeb_shit = ['anime', 'hentai', 'weeb', 'yaoi', 'uwu', 'owo']
 # names for Master Chief
 demon_names = ['demon', 'chief', 'spartan', '117']
 
+# insult words
+insults = ['crack', 'slut', 'lord', 'bitch', 'horse', 'fuck', 'pig', 'goat', 'dumb', 'chode', 'ape', 'ass', 'face',
+           'hole', 'baby', 'fucker', 'bastard', 'blubber', 'bozo', 'boomer', 'man', 'boy', 'girl', 'cock', 'womble',
+           'cow', 'whore', 'cuck', 'incel', 'simp', 'dildo', 'douche', 'bucket', 'rat', 'stink']
+
+vowels = ['a', 'e', 'i', 'o', 'u']
+
 
 def is_me(ctx):  # checks if a message's author's id matches my id
-    return ctx.message.author.id == 285712348084174849
+    return ctx.message.author.id == id
 
 ########################################################################################################################
 
@@ -125,6 +138,10 @@ async def on_message(message):  # replies to certain messages the bot can see
         await message.channel.send('l33t gam3r')
         with open('ShipmasterChadLog.txt', 'a+') as f:
             f.write(f'l33t gam3r, {now.strftime("%Y-%m-%d %H:%M:%S")}\n')
+    if 'gamer' in message.content.lower():
+        await message.channel.send('Rise Up')
+        with open('ShipmasterChadLog.txt', 'a+') as f:
+            f.write(f'Gamers Rise Up, {now.strftime("%Y-%m-%d %H:%M:%S")}\n')
     for phrases in weeb_shit:
         if phrases in message.content.lower():
             await message.channel.send(f'^fuckin weeaboos')
@@ -217,6 +234,42 @@ async def spam(ctx, user: discord.User, amount, *, message):  # spams a [user] [
         f.write(f'{ctx.author} sent {user.name} "{message}" {amount} times, {now.strftime("%Y-%m-%d %H:%M:%S")}\n')
     for _ in range(int(amount)):
         await user.send(message)
+
+
+@client.command()
+async def diagnose(ctx, user: discord.User, *, diagnosis):  # diagnose a [user] with a [diagnosis]
+    await ctx.send(f'I diagnose {user.name} with {diagnosis}')
+    with open('ShipmasterChadLog.txt', 'a+') as f:
+        f.write(f'{ctx.author} diagnosed {user.name} with {diagnosis}, {now.strftime("%Y-%m-%d %H:%M:%S")}\n')
+
+
+@client.command()
+async def insult(ctx, user: discord.User):
+    ins = random.choice(insults) + random.choice(insults) + ' ' + random.choice(insults) + random.choice(insults)
+    a = 'a '
+    for vowel in vowels:
+        if ins.startswith(vowel):
+            a = 'an '
+    ins = a + ins
+    await ctx.send(f'{user.name} is {ins}')
+    with open('ShipmasterChadLog.txt', 'a+') as f:
+        f.write(f'{ctx.author} called {user.name} {ins}, {now.strftime("%Y-%m-%d %H:%M:%S")}\n')
+
+
+@client.command()
+async def winner(ctx, *users: discord.User):
+    win = random.choice(users)
+    await ctx.send(f'{win} is the winner of this argument')
+    with open('ShipmasterChadLog.txt', 'a+') as f:
+        f.write(f'{win} won the argument, {now.strftime("%Y-%m-%d %H:%M:%S")}\n')
+
+
+@client.command()
+async def blame(ctx, *users: discord.User):
+    at_fault = random.choice(users)
+    await ctx.send(f'{at_fault} is to blame')
+    with open('ShipmasterChadLog.txt', 'a+') as f:
+        f.write(f'{at_fault} was blamed, {now.strftime("%Y-%m-%d %H:%M:%S")}\n')
 
 ########################################################################################################################
 
